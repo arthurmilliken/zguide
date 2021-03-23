@@ -1,20 +1,19 @@
 // Weather update server
 // Binds PUB socket to tcp://*:5556
 // Publishes random weather updates
-
 #include "zhelpers.h"
 
 int main (void)
 {
-  // Prepare our context and publisher
-  void *context = zmq_ctx_new ();
-  void *publisher = zmq_socket (context, ZMQ_PUB);
-  int rc = zmq_bind (publisher, "tcp://*:5556");
-  assert (rc == 0);
+  // Publisher socket
+  char bind_addr[] = "tcp://*:5556";
+  zsock_t *publisher = zsock_new_pub (bind_addr);
+  assert(publisher);
+  printf ("S: wuserver bound to %s\n", bind_addr);
 
   // Initialize random number generator
   srandom ((unsigned) time (NULL));
-  while (1) {
+  while (true) {
     // Get values that will fool the boss
     int zipcode, temperature, relhumidity;
     zipcode =     randof (100000);
@@ -22,11 +21,11 @@ int main (void)
     relhumidity = randof (50) + 10;
 
     // Send message to all subscribers
-    char update [20];
+    char update [15];
     sprintf (update, "%05d %d %d", zipcode, temperature, relhumidity);
-    s_send (publisher, update);
+    int rc = zstr_send (publisher, update);
+    assert(rc == 0);
   }
-  zmq_close (publisher);
-  zmq_ctx_destroy (context);
+  zsock_destroy(&publisher);
   return 0;
 }
