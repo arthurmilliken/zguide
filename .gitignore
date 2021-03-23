@@ -1,0 +1,8 @@
+bin
+
+# C
+*.o
+hellomake/hellomake
+
+# Python
+__pycache__
