@@ -6,7 +6,7 @@ DEPS = $(SRC)/zhelpers.h
 CC=gcc
 CFLAGS=-I$(SRC)/
 
-PROGS = version hello server client wuserver wuclient test
+PROGS = version hello server client wuserver wuclient taskvent taskwork tasksink test
 TARGETS = $(addprefix $(BIN)/,$(PROGS))
 
 all: $(TARGETS)
