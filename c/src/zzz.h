@@ -6,6 +6,7 @@
 #include <zmq.h>
 #include <czmq.h>
 #include <stdint.h>
+#include <string.h>
 
 #if RAND_MAX/256 >= 0xFFFFFFFFFFFFFF
 #define LOOP_COUNT 1

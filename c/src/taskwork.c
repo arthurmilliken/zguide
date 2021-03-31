@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
 	// Socket to receive messages on
 	zsock_t* receiver = zsock_new(ZMQ_PULL);
 	int rc = zsock_connect(receiver, "tcp://localhost:5557");
-	assert(rc == 0);
+	assert(rc >= 0);
 
 	// Socket to send messages to
 	zsock_t* sender = zsock_new_push("tcp://localhost:5558");

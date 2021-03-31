@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	assert(sink);
 
 	printf("Press enter when the workers are ready: ");
-	rc = getchar();
+	getchar();
 	printf("Sending tasks to workers...\n");
 
 	// The first message is "0" and signals start of batch
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		char string[10];
 		sprintf(string, "%d", workload);
 		rc = zstr_send(sender, string);
-		assert(rc == 0);
+		assert(rc >= 0);
 	}
 	printf("Total expected cost: %d msec\n", total_msec);
 	zsock_destroy(&sink);
