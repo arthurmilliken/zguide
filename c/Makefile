@@ -1,13 +1,14 @@
 SRC=src
 BIN=bin
 LIBS = -lczmq -lzmq
-DEPS = $(SRC)/zhelpers.h
+DEPS = $(SRC)/zzz.h
 
 CC=gcc
 CFLAGS=-I$(SRC)/
 
 PROGS = version hello server client wuserver wuclient \
-		taskvent taskwork tasksink msreader mspoller test
+		taskvent taskwork tasksink msreader mspoller \
+		rrclient rrworker rrbroker msgqueue test
 TARGETS = $(addprefix $(BIN)/,$(PROGS))
 
 all: $(TARGETS)

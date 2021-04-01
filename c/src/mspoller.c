@@ -16,7 +16,7 @@ int main(void) {
     zmq_setsockopt(subscriber, ZMQ_SUBSCRIBE, "10001", 5);
 
     // Process messages from both sockets
-    
+    int rc;
     while(1) {
         char msg[256];
         memset(msg, 0, 255);
@@ -25,21 +25,20 @@ int main(void) {
             { subscriber, 0, ZMQ_POLLIN, 0 }
         };
         memset(msg, 0, 255);
-        zmq_poll(items, 2, -1);
+        rc = zmq_poll(items, 2, -1);
+        if (rc < 0) break;
         if (items[0].revents & ZMQ_POLLIN) {
             int size = zmq_recv(receiver, msg, 255, 0);
-            if (size != -1) {
-                // Process task
-                printf("received from ventilator: %s\n", msg);
-        		s_sleep(atoi(msg)); // Do the work
-            }
+            if (size < 0) break;
+            // Process task
+            printf("received from ventilator: %s\n", msg);
+            s_sleep(atoi(msg)); // Do the work
         }
         if (items[1].revents & ZMQ_POLLIN) {
             int size = zmq_recv(subscriber, msg, 255, 0);
-            if (size != -1) {
-                // Process weather update
-                printf("Received from wuserver: %s\n", msg);
-            }
+            if (size < 0) break;
+            // Process weather update
+            printf("Received from wuserver: %s\n", msg);
         }
     }
     zmq_close(receiver);

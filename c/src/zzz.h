@@ -5,6 +5,7 @@
 
 #include <zmq.h>
 #include <czmq.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -107,6 +108,16 @@ static char* s_recv(void* socket) {
         return NULL;
     buffer[size < cap ? size : cap - 1] = '\0';
     return strdup(buffer);
+}
+
+static void destroy_and_quit(int count, ...) {
+	va_list args;
+	va_start(args, count);
+	for (int i = 0; i < count; i++) {
+		zsock_t* sock = va_arg(args, zsock_t*);
+		zsock_destroy(&sock);
+	}
+	exit(1);
 }
 
 #endif  //  __ZZZ_H_INCLUDED__

@@ -9,9 +9,12 @@ int main(int argc, char* argv[]) {
 	// Prepare our context and socket
 	zsock_t* receiver = zsock_new_pull("tcp://*:5558");
 	assert(receiver);
+	zsock_t* socks[] = { receiver };
 
 	// Wait for start of batch
 	char* string = zstr_recv(receiver);
+	if (string == NULL)
+		destroy_and_quit(1, receiver);
 	zstr_free(&string);
 
 	// Start our clock now
@@ -21,6 +24,8 @@ int main(int argc, char* argv[]) {
 	int task_nbr;
 	for (task_nbr = 0; task_nbr < 100; task_nbr++) {
 		string = zstr_recv(receiver);
+		if (string == NULL)
+			destroy_and_quit(1, receiver);
 		zstr_free(&string);
 		if (task_nbr % 10 == 0)
 			printf(":");

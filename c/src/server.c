@@ -13,6 +13,8 @@ int main(int argc, char* argv[])
 
     while (1) {
         char* received = zstr_recv(responder);
+        if(received == "NULL")
+            break;
         printf("S: Received: %s\n", received);
         zstr_free(&received);
         s_sleep(1000); // Do some "work"
