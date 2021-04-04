@@ -9,10 +9,10 @@ int main(int argc, char* argv[]) {
     char* filter = (argc > 1) ? argv[1] : "10001";
 
     // Subscriber socket
-    char bind_addr[] = "tcp://localhost:5556";
-    zsock_t* subscriber = zsock_new_sub(bind_addr, filter);
+    char conn_url[] = "tcp://localhost:5556";
+    zsock_t* subscriber = zsock_new_sub(conn_url, filter);
     assert(subscriber);
-    printf("C: wuclient connected to %s\n", bind_addr);
+    printf("C: wuclient connected to %s\n", conn_url);
     printf("C: Collecting updates for '%s' from weather server...\n", filter);
 
     // Process 100 updates

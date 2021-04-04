@@ -5,9 +5,62 @@
 
 #include <zmq.h>
 #include <czmq.h>
-#include <stdarg.h>
 #include <stdint.h>
-#include <string.h>
+
+///////////////////////////////////////
+// FUNCTIONS
+///////////////////////////////////////
+static int version(int argc, char* argv[]) {
+    int major, minor, patch;
+    zmq_version(&major, &minor, &patch);
+    printf("Current 0MQ version is %d.%d.%d\n", major, minor, patch);
+    zsys_version(&major, &minor, &patch);
+    printf("Current CZMQ version is %d.%d.%d\n", major, minor, patch);
+    return 0;
+}
+
+#ifdef WIN32
+static int gettimeofday(struct timeval* tp, struct timezone* tzp)
+{
+    // Note: some broken versions only have 8 trailing zero's, the correct epoch has 9 trailing zero's
+    // This magic number is the number of 100 nanosecond intervals since January 1, 1601 (UTC)
+    // until 00:00:00 January 1, 1970 
+    static const uint64_t EPOCH = ((uint64_t)116444736000000000ULL);
+
+    SYSTEMTIME  system_time;
+    FILETIME    file_time;
+    uint64_t    time;
+
+    GetSystemTime(&system_time);
+    SystemTimeToFileTime(&system_time, &file_time);
+    time = ((uint64_t)file_time.dwLowDateTime);
+    time += ((uint64_t)file_time.dwHighDateTime) << 32;
+
+    tp->tv_sec = (long)((time - EPOCH) / 10000000L);
+    tp->tv_usec = (long)(system_time.wMilliseconds * 1000);
+    return 0;
+}
+#endif
+
+//  Print formatted string to stdout, prefixed by date/time and
+//  terminated with a newline.
+static void s_console(const char* format, ...)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    time_t curtime = (time_t)tv.tv_sec;
+
+    char formatted[20];
+    strftime(formatted, 20, "%Y-%m-%d %H:%M:%S", localtime(&curtime));
+    printf("%s.%ld ", formatted, tv.tv_usec/1000);
+
+    va_list argptr;
+    va_start(argptr, format);
+    vprintf(format, argptr);
+    va_end(argptr);
+    printf("\n");
+}
+
 
 #if RAND_MAX/256 >= 0xFFFFFFFFFFFFFF
 #define LOOP_COUNT 1
@@ -24,7 +77,9 @@
 static uint64_t rand64(void) {
     static bool seeded = false;
     if (!seeded) {
-        srand((unsigned)time(NULL));
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        srand(tv.tv_usec);
         seeded = true;
     }
     uint64_t r = 0;
@@ -37,25 +92,6 @@ static uint64_t rand64(void) {
 // Generate a random number between 0 and max.
 static uint32_t randto(uint32_t max) {
     return (uint32_t)rand64() % max;
-}
-
-//  Print formatted string to stdout, prefixed by date/time and
-//  terminated with a newline.
-static void s_console(const char* format, ...)
-{
-    time_t curtime = time(NULL);
-    struct tm* loctime = localtime(&curtime);
-    char* formatted = (char*)malloc(20);
-    if (formatted != NULL)
-        strftime(formatted, 20, "%y-%m-%d %H:%M:%S ", loctime);
-    printf("%s", formatted);
-    free(formatted);
-
-    va_list argptr;
-    va_start(argptr, format);
-    vprintf(format, argptr);
-    va_end(argptr);
-    printf("\n");
 }
 
 //  Sleep for a number of milliseconds
@@ -111,13 +147,13 @@ static char* s_recv(void* socket) {
 }
 
 static void destroy_and_quit(int count, ...) {
-	va_list args;
-	va_start(args, count);
-	for (int i = 0; i < count; i++) {
-		zsock_t* sock = va_arg(args, zsock_t*);
-		zsock_destroy(&sock);
-	}
-	exit(1);
+    va_list args;
+    va_start(args, count);
+    for (int i = 0; i < count; i++) {
+        zsock_t* sock = va_arg(args, zsock_t*);
+        zsock_destroy(&sock);
+    }
+    exit(1);
 }
 
 #endif  //  __ZZZ_H_INCLUDED__
