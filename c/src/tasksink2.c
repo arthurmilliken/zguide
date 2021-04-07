@@ -38,7 +38,7 @@ int main(void) {
     // Send KILL signal to workers.
     rc = s_send(controller, "KILL");
     assert(rc >= 0);
-
+    
     zmq_close(receiver);
     zmq_close(controller);
     zmq_ctx_destroy(context);
