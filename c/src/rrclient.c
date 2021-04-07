@@ -11,6 +11,7 @@ int main (int argc, char* argv[]) {
     // Socket to talk to server
     char conn_url[] = "tcp://localhost:5559";
     zsock_t* requester = zsock_new_req(conn_url);
+    assert(requester);
     s_console("%s: rrclient connected to %s", name, conn_url);
 
     int request_nbr, rc;

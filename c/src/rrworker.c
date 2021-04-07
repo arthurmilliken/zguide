@@ -20,7 +20,7 @@ int main (int argc, char* argv[]) {
         // Wait for next request from client
         char* string = zstr_recv(responder);
         if (!string) break;
-        s_console("%s: Received request: [%s]", name, string);
+        s_console("%s: Received request: '%s'", name, string);
         zstr_free(&string);
         
         // Do some "work"
@@ -28,7 +28,7 @@ int main (int argc, char* argv[]) {
 
         // Send reply back to client
         string = "World";
-        s_console("%s: sending reply: [%s]", name, string);
+        s_console("%s: Sending reply: '%s'", name, string);
         rc = zstr_send(responder, "World");
         assert(rc == 0);
     }

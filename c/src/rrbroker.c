@@ -3,52 +3,36 @@
 //
 #include "zzz.h"
 
-int main(void)
-{
-    // Prepare our context and sockets
-    void* context = zmq_ctx_new();
-    void* frontend = zmq_socket(context, ZMQ_ROUTER);
-    void* backend = zmq_socket(context, ZMQ_DEALER);
-    zmq_bind(frontend, "tcp://*:5559");
-    zmq_bind(backend, "tcp://*:5560");
+int main(int argc, char* argv[]) {
+    char* name = (argc > 1) ? argv[1]: "B";
+
+    // Prepare our sockets
+    char fendpoint[] = "tcp://*:5559";
+    zsock_t* frontend = zsock_new_router(fendpoint);
+    assert(frontend);
+    s_console("%s: rrbroker bound front-end: %s", name, fendpoint);
+
+    char bendpoint[] = "tcp://*:5560";
+    zsock_t* backend = zsock_new(ZMQ_DEALER);
+    int rc = zsock_bind(backend, "%s", bendpoint);
+    assert(rc >= 0);
+    s_console("%s: rrbroker bound back-end: %s", name, bendpoint);
 
     // Initialize poll set
-    zmq_pollitem_t items[] = {
-        { frontend, 0, ZMQ_POLLIN, 0 },
-        { backend,  0, ZMQ_POLLIN, 0 }
-    };
+    zpoller_t* poller = zpoller_new(frontend, backend, NULL);
+    assert(poller);
 
     // Switch messages between sockets
     while (1) {
-        zmq_msg_t message;
-        zmq_poll (items, 2, -1);
-        if (items[0].revents & ZMQ_POLLIN) {
-            while (1) {
-                // Process all parts of the message
-                zmq_msg_init(&message);
-                zmq_msg_recv(&message, frontend, 0);
-                int more = zmq_msg_more(&message);
-                zmq_msg_send(&message, backend, more ? ZMQ_SNDMORE : 0);
-                zmq_msg_close(&message);
-                if (!more)
-                    break; // Last message part
-            }
-        }
-        if (items[1].revents & ZMQ_POLLIN) {
-            while (1) {
-                zmq_msg_init(&message);
-                zmq_msg_recv(&message, backend, 0);
-                int more = zmq_msg_more(&message);
-                zmq_msg_send(&message, frontend, more ? ZMQ_SNDMORE : 0);
-                zmq_msg_close(&message);
-                if (!more)
-                    break; 
-            }
-        }
+        zsock_t* from = (zsock_t*) zpoller_wait(poller, -1);
+        if (!from) break;
+        zsock_t* to = (from == frontend ? backend : frontend);
+        zmsg_t* msg = zmsg_recv(from);
+        rc = zmsg_send(&msg, to);
+        assert(rc == 0);
     }
-    // We never get here, but clean up anyhow
-    zmq_close(frontend);
-    zmq_close(backend);
-    zmq_ctx_destroy(context);
+    zsock_destroy(&frontend);
+    zsock_destroy(&backend);
+    s_console("%s: rrbroker done.", name);
     return 0;
 }
