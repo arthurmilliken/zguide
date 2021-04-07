@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
     char bind_addr[] = "tcp://*:5556";
     zsock_t* publisher = zsock_new_pub(bind_addr);
     assert(publisher);
-    printf("S: wuserver bound to %s\n", bind_addr);
+    s_console("S: wuserver bound to %s", bind_addr);
 
     while (true) {
         // Get values that will fool the boss
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
         int rc = zstr_send(publisher, update);
         assert(rc == 0);
     }
-    puts("S: done");
+    s_console("S: done");
     zsock_destroy(&publisher);
     return 0;
 }

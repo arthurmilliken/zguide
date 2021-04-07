@@ -7,13 +7,13 @@
 
 int main(int argc, char* argv[]) {
     char* filter = (argc > 1) ? argv[1] : "10001";
+    char* conn_url = (argc > 2) ? argv[2] : "tcp://localhost:5556";
 
     // Subscriber socket
-    char conn_url[] = "tcp://localhost:5556";
     zsock_t* subscriber = zsock_new_sub(conn_url, filter);
     assert(subscriber);
-    printf("C: wuclient connected to %s\n", conn_url);
-    printf("C: Collecting updates for '%s' from weather server...\n", filter);
+    s_console("C: wuclient connected to %s", conn_url);
+    s_console("C: Collecting updates for '%s' from weather server...", filter);
 
     // Process 100 updates
     int update_nbr;
@@ -27,8 +27,8 @@ int main(int argc, char* argv[]) {
         total_temp += temperature;
         zstr_free(&msg);
     }
-    printf(
-        "C: Average temperature for zipcode '%s' was %dF\n",
+    s_console(
+        "C: Average temperature for zipcode '%s' was %dF",
         filter,
         (int)(total_temp / update_nbr)
     );
