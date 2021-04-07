@@ -20,13 +20,13 @@ int main(int argc, char* argv[]) {
 	// Process tasks forever
 	while (1) {
 		char* string = zstr_recv(receiver);
+		if (!string) break;
 		printf("%s.", string); // Show progress
 		fflush(stdout);
 		s_sleep(atoi(string)); // Do the work
 		zstr_free(&string);
 		zstr_send(sender, ""); // Send results to sink
 	}
-
 	zsock_destroy(&receiver);
 	zsock_destroy(&sender);
 	return 0;

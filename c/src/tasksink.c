@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 			destroy_and_quit(1, receiver);
 		zstr_free(&string);
 		if (task_nbr % 10 == 0)
-			printf(":");
+			printf("|");
 		else
 			printf(".");
 		fflush(stdout);

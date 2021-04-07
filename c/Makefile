@@ -7,8 +7,9 @@ CC=gcc
 CFLAGS=-I$(SRC)/
 
 PROGS = version hello server client wuserver wuclient \
-		taskvent taskwork tasksink msreader mspoller \
-		rrclient rrworker rrbroker msgqueue test
+		taskvent taskwork taskwork2 tasksink tasksink2 \
+		rrclient rrworker rrbroker msgqueue \
+		msreader mspoller test
 TARGETS = $(addprefix $(BIN)/,$(PROGS))
 
 all: $(TARGETS)
