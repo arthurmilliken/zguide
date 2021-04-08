@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
         int rc = zstr_send(responder, sending);
         assert(rc == 0);
     }
-
     zsock_destroy(&responder);
+    puts("\nS: done.");
     return 0;
 }

@@ -16,14 +16,15 @@ int main(int argc, char* argv[])
         char sending[] = "Hello";
         printf("C: Sending %s [%d]...\n", sending, request_nbr);
         rc = zstr_send(requester, sending);
-        assert(rc == 0);
+        if (rc < 0) break;
 
         char* received = zstr_recv(requester);
+        if (!received) break;
         printf("C: Received '%s' %d\n", received, request_nbr);
         zstr_free(&received);
     }
 
     zsock_destroy(&requester);
-    puts("C: done.");
+    puts("\nC: done.");
     return 0;
 }
