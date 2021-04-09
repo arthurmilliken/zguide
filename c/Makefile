@@ -4,7 +4,7 @@ LIBS = -lczmq -lzmq
 DEPS = $(SRC)/zzz.h
 
 CC=gcc
-CFLAGS=-I$(SRC)/
+CFLAGS=-I$(SRC)/ -DDEBUG
 
 PROGS = version hello test \
 		server client interrupt \
@@ -17,7 +17,7 @@ TARGETS = $(addprefix $(BIN)/,$(PROGS))
 all: $(TARGETS)
 
 bin/%: $(SRC)/$(notdir %).c $(DEPS)
-	$(CC) $< -o $@ $(LIBS)
+	$(CC) $< -o $@ $(CFLAGS) $(LIBS)
 
 .PHONY: clean
 clean:
