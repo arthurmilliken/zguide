@@ -3,7 +3,11 @@
 int main(void)
 {
     s_console("Hello from test!");
-    s_sleep(500);
-    s_console("randto(10000) = %d", randto(10000));
+    long interval;
+    while(1) {
+        interval = randto(1000);
+        s_sleep(interval);
+        s_console("ping");
+    }
     return 0;
 }

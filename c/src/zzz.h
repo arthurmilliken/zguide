@@ -52,7 +52,8 @@ static void s_console(const char* format, ...)
 
     char formatted[20];
     strftime(formatted, 20, "%Y-%m-%d %H:%M:%S", localtime(&curtime));
-    printf("%s.%ld ", formatted, tv.tv_usec/1000);
+    printf("%s.%03ld ", formatted, tv.tv_usec/1000); // millisecond precision
+    // printf("%s.%06ld ", formatted, tv.tv_usec); // microsecond precision
 
     va_list argptr;
     va_start(argptr, format);
