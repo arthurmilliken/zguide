@@ -13,7 +13,8 @@ PROGS = version hello test \
 		rrclient rrworker rrbroker msgqueue \
 		msreader mspoller \
 		lbclient lbserver lbproxy \
-		mtrelay syncpub syncsub
+		mtrelay syncpub syncsub \
+		psenvpub psenvsub
 TARGETS = $(addprefix $(BIN)/,$(PROGS))
 
 all: $(TARGETS)
